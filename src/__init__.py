@@ -1,5 +1,16 @@
 from fastapi import FastAPI
 from src.books.routes import books_router
+from contextlib import asynccontextmanager
+from src.db.main import init_db
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Starting up...")
+    await init_db()
+    print("Database initialized")
+    yield
+
 
 
 version = "v1"
@@ -19,6 +30,7 @@ app = FastAPI(
     title="Bookly",
     description=description,
     version=version,
+    lifespan=lifespan,
     contact={
         "name": "Pratik Solanki",
         "url": "https://github.com/pratik-solanki-xduce",
