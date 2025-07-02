@@ -11,7 +11,6 @@ For more details, contact the project's [owner](mailto:pratik.solanki@xduce.com)
 3. [Project Setup](#project-setup)
 4. [Running the Application](#running-the-application)
 5. [Running Tests](#running-tests)
-6. [Contributing](#contributing)
 
 ## Getting Started
 Follow the instructions below to set up and run your FastAPI project.
