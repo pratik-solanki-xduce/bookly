@@ -2,7 +2,7 @@
 
 This is the source code for the [FastAPI Beyond CRUD]. This focuses on FastAPI development concepts that go beyond the basic CRUD operations.
 
-For more details, visit the project's [website](mailto:pratik.solanki@xduce.com).
+For more details, contact the project's [owner](mailto:pratik.solanki@xduce.com).
 
 ## Table of Contents
 
