@@ -1,11 +1,10 @@
 import asyncio
 from datetime import datetime, timedelta
-import email
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import JSONResponse
 
-from src.auth.schemas import UserCreateModel, UserLoginModel
+from src.auth.schemas import UserBooksModel, UserCreateModel, UserLoginModel
 from src.auth.service import UserService
 from src.db.main import get_session
 from src.auth.utils import create_access_token, decode_token, verify_password
@@ -111,7 +110,7 @@ async def revoke_token(token_details: dict = Depends(AccessTokenBearer())):
     )
 
 
-@auth_router.get("/me")
+@auth_router.get("/me", response_model=UserBooksModel)
 async def get_current_user(
     user=Depends(get_current_user), _: bool = Depends(role_checker)
 ):

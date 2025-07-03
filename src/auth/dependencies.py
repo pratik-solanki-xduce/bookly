@@ -5,7 +5,7 @@ from fastapi.security.http import HTTPAuthorizationCredentials
 from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.models import User
-from src.auth.routes import UserService
+from src.auth.service import UserService
 from src.auth.utils import decode_token
 from src.db.main import get_session
 from src.db.redis import token_in_blocklist

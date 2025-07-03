@@ -6,8 +6,7 @@ from src.books.models import Book
 from src.books.schemas import BookCreateModel, BookUpdateModel
 from src.books.service import BookService
 from src.db.main import get_session
-from src.auth.dependencies import AccessTokenBearer, RefreshTokenBearer
-from src.auth.dependencies import RoleChecker
+from src.auth.dependencies import AccessTokenBearer, RoleChecker
 
 books_router = APIRouter()
 book_service = BookService()
@@ -24,6 +23,19 @@ async def get_all_books(
     return books
 
 
+@books_router.get(
+    "/user/{user_uid}", response_model=List[Book], dependencies=[role_checker]
+)
+async def get_user_book_submissions(
+    user_uid: str,
+    session: AsyncSession = Depends(get_session),
+    _: dict = Depends(access_token_bearer),
+):
+    books = await book_service.get_user_books(user_uid, session)
+    return books
+
+
+
 @books_router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
@@ -35,7 +47,8 @@ async def create_book(
     session: AsyncSession = Depends(get_session),
     token_details: dict = Depends(access_token_bearer),
 ):
-    new_book = await book_service.create_book(book_data, session)
+    user_id = token_details.get("user")["user_uid"]
+    new_book = await book_service.create_book(book_data, user_id, session)
     return new_book
 
 

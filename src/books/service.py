@@ -18,7 +18,7 @@ class BookService:
     async def get_user_books(self, user_uid: str, session: AsyncSession):
         statement = (
             select(Book)
-            .where(Book.user_uid == user_uid)
+            .where(Book.user_uid == uuid.UUID(user_uid))
             .order_by(desc(Book.created_at))
         )
 
@@ -36,11 +36,11 @@ class BookService:
         return book if book is not None else None
 
     async def create_book(
-        self, book_data: BookCreateModel, session: AsyncSession
+        self, book_data: BookCreateModel, user_id: str, session: AsyncSession
     ):
         book_data_dict = book_data.model_dump()
 
-        new_book = Book(**book_data_dict)
+        new_book = Book(**book_data_dict, user_uid=uuid.UUID(user_id))
 
         session.add(new_book)
 

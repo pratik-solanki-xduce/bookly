@@ -1,4 +1,8 @@
+from datetime import datetime
+from typing import List
+import uuid
 from pydantic import BaseModel, Field
+from src.books.schemas import Book
 
 class UserCreateModel(BaseModel):
     first_name: str = Field(max_length=25)
@@ -18,6 +22,23 @@ class UserCreateModel(BaseModel):
             }
         }
     }
+    
+
+class UserModel(BaseModel):
+    uid: uuid.UUID
+    username: str
+    email: str
+    first_name: str
+    last_name: str
+    is_verified: bool
+    password_hash: str = Field(exclude=True)
+    created_at: datetime
+    update_at: datetime
+
+
+class UserBooksModel(UserModel):
+    books: List[Book]
+
     
 
 class UserLoginModel(BaseModel):
