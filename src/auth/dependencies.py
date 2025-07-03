@@ -2,6 +2,7 @@ from fastapi.security import HTTPBearer
 from fastapi.security.http import HTTPAuthorizationCredentials
 from fastapi import HTTPException, Request, status
 from src.auth.utils import decode_token
+from src.db.redis import token_in_blocklist
 
 
 class TokenBearer(HTTPBearer):
@@ -16,10 +17,24 @@ class TokenBearer(HTTPBearer):
         token_data = decode_token(token)
 
         if not self.token_valid(token):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={
+                    "message": "Token is invalid Or expired",
+                    "resolution": "Please get new token",
+                    "error_code": "invalid_token",
+                },
+            )
 
         if await token_in_blocklist(token_data["jti"]):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={
+                    "message": "Token is invalid or has been revoked",
+                    "resolution": "Please get new token",
+                    "error_code": "token_revoked",
+                },
+            )
 
         self.verify_token_data(token_data)
 
@@ -37,10 +52,14 @@ class TokenBearer(HTTPBearer):
 class AccessTokenBearer(TokenBearer):
     def verify_token_data(self, token_data: dict) -> None:
         if token_data and token_data["refresh"]:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+            )
 
 
 class RefreshTokenBearer(TokenBearer):
     def verify_token_data(self, token_data: dict) -> None:
         if token_data and not token_data["refresh"]:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token"
+            )
