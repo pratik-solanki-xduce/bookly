@@ -9,11 +9,17 @@ from src.auth.schemas import UserCreateModel, UserLoginModel
 from src.auth.service import UserService
 from src.db.main import get_session
 from src.auth.utils import create_access_token, decode_token, verify_password
-from src.auth.dependencies import AccessTokenBearer, RefreshTokenBearer
+from src.auth.dependencies import (
+    AccessTokenBearer,
+    RefreshTokenBearer,
+    get_current_user,
+    RoleChecker,
+)
 from src.db.redis import add_jti_to_blocklist
 
 auth_router = APIRouter()
 user_service = UserService()
+role_checker = RoleChecker(allowed_roles=["admin", "user"])
 
 REFRESH_TOKEN_EXPIRY = 2
 
@@ -103,3 +109,10 @@ async def revoke_token(token_details: dict = Depends(AccessTokenBearer())):
     return JSONResponse(
         content={"message": "Logged Out Successfully"}, status_code=status.HTTP_200_OK
     )
+
+
+@auth_router.get("/me")
+async def get_current_user(
+    user=Depends(get_current_user), _: bool = Depends(role_checker)
+):
+    return user
