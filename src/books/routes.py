@@ -2,8 +2,8 @@ from typing import List
 from fastapi import Depends, status, APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.books.models import Book
-from src.books.schemas import BookCreateModel, BookUpdateModel
+from src.db.models import Book
+from src.books.schemas import BookCreateModel, BookUpdateModel, BookDetailModel
 from src.books.service import BookService
 from src.db.main import get_session
 from src.auth.dependencies import AccessTokenBearer, RoleChecker
@@ -35,7 +35,6 @@ async def get_user_book_submissions(
     return books
 
 
-
 @books_router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
@@ -52,7 +51,7 @@ async def create_book(
     return new_book
 
 
-@books_router.get("/{book_uid}", response_model=Book, dependencies=[role_checker])
+@books_router.get("/{book_uid}", response_model=BookDetailModel, dependencies=[role_checker])
 async def get_book(
     book_uid: str,
     session: AsyncSession = Depends(get_session),

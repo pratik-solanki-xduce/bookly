@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlmodel import desc, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src.books.models import Book
+from src.db.models import Book
 from src.books.schemas import BookCreateModel, BookUpdateModel
 
 
@@ -52,7 +52,7 @@ class BookService:
         self, book_uid: str, update_data: BookUpdateModel, session: AsyncSession
     ):
         book_to_update = await self.get_book(book_uid, session)
-        
+
         if book_to_update is not None:
             update_data_dict = update_data.model_dump()
 
