@@ -33,6 +33,8 @@ from src.errors import InvalidCredentials, InvalidToken, UserAlreadyExists, User
 from src.auth.schemas import EmailModel
 from src.mail import create_message, mail
 from src.celery_tasks import send_email
+from jinja2 import Environment, FileSystemLoader
+
 
 auth_router = APIRouter()
 user_service = UserService()
@@ -41,17 +43,23 @@ role_checker = RoleChecker(allowed_roles=["admin", "user"])
 REFRESH_TOKEN_EXPIRY = 2
 
 
+env = Environment(loader=FileSystemLoader("templates"))
+
+
 @auth_router.post("/send_mail")
 async def send_mail(emails: EmailModel):
+
+    template = env.get_template("welcome.html")
+
     emails = emails.addresses
 
-    html = "<h1>Welcome to the app</h1>"
+    html = template.render()
     subject = "Welcome to our app"
 
-    send_email.delay(emails, subject, html)
+    # send_email.delay(emails, subject, html)
 
-    # message = create_message(emails, subject, html)
-    # await mail.send_message(message)
+    message = create_message(emails, subject, html)
+    await mail.send_message(message)
 
     return {"message": "Email sent successfully"}
 
