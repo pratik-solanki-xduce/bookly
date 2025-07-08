@@ -56,10 +56,10 @@ async def send_mail(emails: EmailModel):
     html = template.render()
     subject = "Welcome to our app"
 
-    # send_email.delay(emails, subject, html)
+    send_email.delay(emails, subject, html)
 
-    message = create_message(emails, subject, html)
-    await mail.send_message(message)
+    # message = create_message(emails, subject, html)
+    # await mail.send_message(message)
 
     return {"message": "Email sent successfully"}
 
